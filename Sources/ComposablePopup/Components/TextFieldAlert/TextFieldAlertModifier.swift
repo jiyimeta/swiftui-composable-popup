@@ -18,7 +18,7 @@ extension View {
             state: toDestinationState,
             action: fromDestinationAction
         ) { `self`, $isPresented, destination in
-            let textFieldAlertState = store.state.value.wrappedValue.flatMap(toDestinationState)
+            let textFieldAlertState = store.stateSubject.value.wrappedValue.flatMap(toDestinationState)
             
             self.textFieldAlert(
                 (textFieldAlertState?.title).map { String(state: $0) } ?? "",

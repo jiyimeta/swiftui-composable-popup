@@ -22,5 +22,7 @@ extension PopupState: Identifiable {
     }
 }
 
-extension PopupState: _EphemeralState {}
+extension PopupState: _EphemeralState {
+    public static var actionType: Any.Type { Action.self }
+}
 extension PopupState: Equatable where Action: Equatable {}
