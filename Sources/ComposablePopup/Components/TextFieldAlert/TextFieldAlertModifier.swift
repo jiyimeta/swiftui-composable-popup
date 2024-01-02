@@ -5,21 +5,21 @@ extension View {
     public func textFieldAlert<ButtonAction>(
         store: Store<PresentationState<TextFieldAlertState<ButtonAction>>, PresentationAction<ButtonAction>>
     ) -> some View {
-        self.textFieldAlert(store: store, state: { $0 }, action: { $0 })
+        textFieldAlert(store: store, state: { $0 }, action: { $0 })
     }
-    
+
     public func textFieldAlert<State, Action, ButtonAction>(
         store: Store<PresentationState<State>, PresentationAction<Action>>,
         state toDestinationState: @escaping (_ state: State) -> TextFieldAlertState<ButtonAction>?,
         action fromDestinationAction: @escaping (_ alertAction: ButtonAction) -> Action
     ) -> some View {
-        self.presentation(
+        presentation(
             store: store,
             state: toDestinationState,
             action: fromDestinationAction
-        ) { `self`, $isPresented, destination in
-            let textFieldAlertState = store.stateSubject.value.wrappedValue.flatMap(toDestinationState)
-            
+        ) { `self`, $isPresented, _ in
+            let textFieldAlertState = store.withState { $0.wrappedValue.flatMap(toDestinationState) }
+
             self.textFieldAlert(
                 (textFieldAlertState?.title).map { String(state: $0) } ?? "",
                 isPresented: $isPresented,
@@ -32,11 +32,20 @@ extension View {
                                 switch button.action.type {
                                 case let .send(commitAction):
                                     if let commitAction {
-                                        store.send(.presented(fromDestinationAction(commitAction.embed(text))))
+                                        store.send(
+                                            .presented(
+                                                fromDestinationAction(commitAction.embed(text))
+                                            )
+                                        )
                                     }
                                 case let .animatedSend(commitAction, animation):
                                     if let commitAction {
-                                        store.send(.presented(fromDestinationAction(commitAction.embed(text))), animation: animation)
+                                        store.send(
+                                            .presented(
+                                                fromDestinationAction(commitAction.embed(text))
+                                            ),
+                                            animation: animation
+                                        )
                                     }
                                 }
                             },

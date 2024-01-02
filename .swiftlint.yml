@@ -119,7 +119,7 @@ opt_in_rules:
   # - let_var_whitespace
   - literal_expression_end_indentation
   - lower_acl_than_parent
-  - missing_docs
+  # - missing_docs
   - modifier_order
   # - multiline_arguments
   # - multiline_arguments_brackets

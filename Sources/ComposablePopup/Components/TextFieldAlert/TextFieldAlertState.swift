@@ -2,15 +2,15 @@ import ComposableArchitecture
 import SwiftUI
 
 public struct TextFieldAlertState<Action>: Identifiable {
-    public typealias CommitAction = CasePath<Action, String>
-    
+    public typealias CommitAction = AnyCasePath<Action, String>
+
     public let id: UUID
     public var buttons: [ButtonState<CommitAction>]
     public var message: TextState?
     public var title: TextState
     public var placeholder: TextState?
     public var defaultText: TextState?
-    
+
     init(
         id: UUID,
         buttons: [ButtonState<CommitAction>],
@@ -26,7 +26,7 @@ public struct TextFieldAlertState<Action>: Identifiable {
         self.placeholder = placeholder
         self.defaultText = defaultText
     }
-    
+
     public init(
         title: () -> TextState,
         @ButtonStateBuilder<CommitAction> actions: () -> [ButtonState<CommitAction>] = { [] },
@@ -43,9 +43,9 @@ public struct TextFieldAlertState<Action>: Identifiable {
             defaultText: defaultText?()
         )
     }
-    
+
     public func map<NewAction>(
-        _ transform: (CommitAction?) -> CasePath<NewAction, String>?
+        _ transform: (CommitAction?) -> AnyCasePath<NewAction, String>?
     ) -> TextFieldAlertState<NewAction> {
         TextFieldAlertState<NewAction>(
             id: id,
@@ -61,7 +61,7 @@ public struct TextFieldAlertState<Action>: Identifiable {
 extension TextFieldAlertState: CustomDumpReflectable {
     public var customDumpMirror: Mirror {
         var children: [(label: String?, value: Any)] = [
-            ("title", title)
+            ("title", title),
         ]
         if !buttons.isEmpty {
             children.append(("actions", buttons))
@@ -83,29 +83,27 @@ extension TextFieldAlertState: CustomDumpReflectable {
     }
 }
 
-extension CasePath: Equatable where Root: Equatable, Value == String {
+extension AnyCasePath: Equatable where Root: Equatable, Value == String {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs ~= rhs.embed("")
     }
 }
 
-extension CasePath: Hashable where Root: Hashable, Value == String {
+extension AnyCasePath: Hashable where Root: Hashable, Value == String {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(embed(""))
     }
 }
 
-
 extension TextFieldAlertState: Equatable where Action: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.title == rhs.title
-        && lhs.message == rhs.message
-        && lhs.buttons == rhs.buttons
-        && lhs.placeholder == rhs.placeholder
-        && lhs.defaultText == rhs.defaultText
+            && lhs.message == rhs.message
+            && lhs.buttons == rhs.buttons
+            && lhs.placeholder == rhs.placeholder
+            && lhs.defaultText == rhs.defaultText
     }
 }
-
 
 extension TextFieldAlertState: Hashable where Action: Hashable {
     public func hash(into hasher: inout Hasher) {
@@ -130,12 +128,12 @@ extension TextFieldAlert.Button.Role {
 
 extension TextFieldAlert.Button {
     init<Action>(
-        _ button: ButtonState<CasePath<Action, String>>,
-        action handler: @escaping (CasePath<Action, String>?) -> Void
+        _ button: ButtonState<AnyCasePath<Action, String>>,
+        action handler: @escaping (AnyCasePath<Action, String>?) -> Void
     ) {
         self.init(
             label: String(state: button.label),
-            action: { text in
+            action: { _ in
                 button.withAction(handler)
             },
             role: button.role.map(TextFieldAlert.Button.Role.init) ?? .default

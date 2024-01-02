@@ -1,8 +1,8 @@
-import Foundation
 import ComposableArchitecture
+import Foundation
 
-public extension PopupState {
-    static func alert(
+extension PopupState {
+    public static func alert(
         title: () -> TextState,
         @ButtonStateBuilder<Action> actions: () -> [ButtonState<Action>] = { [] },
         message: (() -> TextState)? = nil
@@ -15,8 +15,8 @@ public extension PopupState {
             )
         )
     }
-    
-    static func confirmationDialog(
+
+    public static func confirmationDialog(
         titleVisibility: ConfirmationDialogStateTitleVisibility = .automatic,
         title: () -> TextState,
         @ButtonStateBuilder<Action> actions: () -> [ButtonState<Action>] = { [] },
@@ -31,10 +31,11 @@ public extension PopupState {
             )
         )
     }
-    
-    static func textFieldAlert(
+
+    public static func textFieldAlert(
         title: () -> TextState,
-        @ButtonStateBuilder<CasePath<Action, String>> actions: () -> [ButtonState<CasePath<Action, String>>] = { [] },
+        @ButtonStateBuilder<AnyCasePath<Action, String>>
+        actions: () -> [ButtonState<AnyCasePath<Action, String>>] = { [] },
         message: (() -> TextState)? = nil,
         placeholder: (() -> TextState)? = nil,
         defaultText: (() -> TextState)? = nil
